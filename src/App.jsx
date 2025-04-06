@@ -1,23 +1,25 @@
-// src/App.jsx
 import React from "react";
-import { Link } from "react-router-dom";
-import Navbar from "./components/Navbar"; // Importer la Navbar
+import { Routes, Route } from "react-router-dom"; // Importer Routes et Route, sans Router
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Movies from "./pages/Movies";
+import Games from "./pages/Games";
+import Recommendations from "./pages/Recommendations";
 
 const App = () => {
   return (
     <div className="app-container">
-      {/* Navbar ajoutée ici */}
+      {/* Navbar qui sera affichée sur toutes les pages */}
       <Navbar />
 
-      <header className="text-center mt-4">
-        <h1>Welcome to Pixel & Bobines</h1>
-        <p>Your place for movies and games!</p>
-      </header>
-
-      <main className="text-center mt-8">
-        <h2>Explore the Best Content</h2>
-        <p>Browse through our collection of movies and games</p>
-      </main>
+      {/* Définir les différentes pages (routes) */}
+      <Routes>
+        <Route path="/home" element={<Home />} />
+        <Route path="/movies" element={<Movies />} />
+        <Route path="/games" element={<Games />} />
+        <Route path="/recommandations" element={<Recommendations />} />
+        {/* Tu peux définir une route par défaut ici */}
+      </Routes>
 
       <footer className="text-center mt-16">
         <p>&copy; 2025 Pixels & Bobines. All rights reserved.</p>

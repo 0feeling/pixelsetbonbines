@@ -1,4 +1,3 @@
-// src/main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -11,8 +10,8 @@ import Recommendations from "./pages/Recommendations";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Router>
+    <App /> {/* Rendre App directement ici pour qu'il inclut Navbar */}
     <Routes>
-      <Route path="/" element={<App />} />
       <Route path="/home" element={<Home />} />
       <Route path="/movies" element={<Movies />} />
       <Route path="/games" element={<Games />} />
