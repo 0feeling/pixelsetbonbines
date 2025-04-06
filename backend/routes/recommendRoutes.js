@@ -1,3 +1,5 @@
+// backend/routes/recommendRoutes.js
+
 import express from "express";
 import OpenAI from "openai";
 import dotenv from "dotenv";
@@ -6,44 +8,82 @@ dotenv.config();
 
 const router = express.Router();
 
-// Initialisation de l'API OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Route pour obtenir des recommandations basées sur un jeu ou un film
+router.get("/test", (req, res) => {
+  res.json({ message: "recommendations route is working" });
+});
+
 router.get("/", async (req, res) => {
-  const query = req.query.query; // Récupération du paramètre de recherche
+  const query = req.query.query?.trim();
 
   if (!query) {
-    return res.status(400).json({ error: "Aucun jeu ou film fourni" });
+    return res.status(400).json({ error: "Missing 'query' parameter" });
   }
 
   try {
-    // Construction du prompt
     const prompt = `
-      Je veux une recommandation basée sur "${query}".
-      - Si c'est un jeu vidéo, recommande-moi un film similaire.
-      - Si c'est un film, recommande-moi un jeu vidéo similaire.
-      - Explique brièvement pourquoi la recommandation est pertinente.
-    `;
+You are a recommendation engine that links games and movies.
 
-    // Appel à OpenAI
+If the input is a **game**, recommend 3 movies.  
+If the input is a **movie**, recommend 3 games.  
+
+For each recommendation, give:
+- title
+- genre
+- short description (max 2 sentences)
+- reason why it matches the input (1 sentence)
+- estimated similarity percentage (between 60% and 100%)
+
+Return the result in **valid JSON format**, like this:
+
+[
+  {
+    "title": "Example Title",
+    "genre": "Fantasy, Action",
+    "description": "A quick pitch of what it's about.",
+    "reason": "Because it shares themes of X and Y.",
+    "match": 87
+  },
+  ...
+]
+
+Input: "${query}"
+    `.trim();
+
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "user", content: prompt }],
+      model: "gpt-3.5-turbo", // Remplace gpt-4 par gpt-3.5-turbo
+      messages: [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: query } // Remplace 'userQuery' par 'query'
+      ],
       temperature: 0.7,
-      max_tokens: 150
+      max_tokens: 600
     });
 
-    // Récupération et formatage de la réponse
-    const recommendation =
-      response.choices[0]?.message?.content || "Pas de recommandation trouvée.";
+    const content = response.choices[0]?.message?.content;
 
-    res.json({ recommendation });
+    if (!content) {
+      throw new Error("No content returned from OpenAI.");
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(content); // GPT returns real JSON
+    } catch (e) {
+      console.warn("Could not parse GPT response as JSON:", content);
+      return res.status(500).json({ error: "Invalid format from OpenAI." });
+    }
+
+    res.json(parsed);
   } catch (error) {
-    console.error("Erreur OpenAI:", error);
-    res.status(500).json({ error: "Problème avec l'API de recommandation." });
+    console.error("OpenAI error:", error); // Afficher l'erreur complète
+    console.error(error.stack); // Afficher la pile d'appel pour aider à comprendre d'où vient l'erreur
+    res
+      .status(500)
+      .json({ error: "Recommendation engine failed", details: error.message });
   }
 });
 

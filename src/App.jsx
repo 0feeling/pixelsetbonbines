@@ -17,7 +17,7 @@ const App = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/games" element={<Games />} />
-        <Route path="/recommandations" element={<Recommendations />} />
+        <Route path="/recommendations" element={<Recommendations />} />
         {/* Tu peux définir une route par défaut ici */}
       </Routes>
 

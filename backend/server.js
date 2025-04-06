@@ -6,7 +6,7 @@ import movieRoutes from "./routes/movieRoutes.js";
 import recommendRoutes from "./routes/recommendRoutes.js";
 
 dotenv.config();
-console.log(process.env.VITE_OPENAI_API_KEY);
+console.log(process.env.OPENAI_API_KEY);
 
 const app = express();
 
@@ -25,7 +25,7 @@ app.listen(port, () => {
 // Utiliser les routes
 app.use("/api/games", gameRoutes);
 app.use("/api/movies", movieRoutes);
-app.use("/api/recommandations", recommendRoutes);
+app.use("/api/recommendations", recommendRoutes);
 
 // Route par défaut pour gérer les requêtes vers la racine
 app.get("/", (req, res) => {

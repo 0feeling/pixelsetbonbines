@@ -4,7 +4,7 @@
 const RAWG_API_KEY = import.meta.env.VITE_RAWG_API_KEY;
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
-export const fetchGames = async (page = 1, pageSize = 10) => {
+export const fetchGames = async (page = 1, pageSize = 9) => {
   // Construction de l'URL avec la clé API et les paramètres de page
   const url = `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&page=${page}&page_size=${pageSize}`;
 

@@ -1,4 +1,3 @@
-// src/pages/Games.jsx
 import React, { useEffect, useState } from "react";
 import { fetchGames } from "../services/api";
 import CardGame from "../components/CardGame";
@@ -38,23 +37,37 @@ const Games = () => {
   };
 
   return (
-    <div>
-      <h1>Games</h1>
-      <div className="grid grid-cols-3 gap-4">
+    <div className="bg-gradient-to-r from-blue-700 to-indigo-800 min-h-screen text-white py-12">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-extrabold text-gray-100">Games</h1>
+        <p className="text-xl text-gray-300 mt-4">
+          Explore and discover your next favorite game.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 px-6">
         {games.map((game) => (
           <CardGame key={game.id} game={game} />
         ))}
       </div>
 
       {/* Pagination */}
-      <div className="pagination">
-        <button onClick={handlePrevPage} disabled={page === 1}>
+      <div className="pagination mt-8 flex justify-center items-center gap-8">
+        <button
+          onClick={() => setPage((p) => Math.max(p - 1, 1))}
+          disabled={page === 1}
+          className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300 disabled:bg-gray-500"
+        >
           Previous
         </button>
-        <span>
+        <span className="text-lg text-gray-100">
           Page {page} of {totalPages}
         </span>
-        <button onClick={handleNextPage} disabled={page === totalPages}>
+        <button
+          onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+          disabled={page === totalPages}
+          className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300 disabled:bg-gray-500"
+        >
           Next
         </button>
       </div>

@@ -11,55 +11,48 @@ const Movies = () => {
       try {
         const response = await fetch(`/api/movies?page=${page}`);
         const data = await response.json();
-        console.log("Fetched movies data:", data);
-        console.log("data.total_pages:", data.total_pages);
-
-        console.log("Fetched movies data:", data);
-
-        if (Array.isArray(data)) {
-          setMovies(data);
-          setTotalPages(1); // valeur par défaut si pas de pagination
-        } else if (Array.isArray(data.results)) {
+        if (Array.isArray(data.results)) {
           setMovies(data.results);
           if (typeof data.total_pages === "number" && data.total_pages > 1) {
             setTotalPages(data.total_pages);
-          } else {
-            console.warn(
-              "⚠️ total_pages manquant ou invalide :",
-              data.total_pages
-            );
           }
-        } else {
-          console.error("Bad data format:", data);
         }
       } catch (error) {
         console.error("Error fetching movies:", error);
       }
     };
-
     getMovies();
   }, [page]);
 
   return (
-    <div>
-      <h1>Movies</h1>
-      <div className="grid grid-cols-3 gap-4">
+    <div className="bg-gradient-to-r from-blue-700 to-indigo-800 min-h-screen text-white py-12">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-extrabold text-gray-100">Movies</h1>
+        <p className="text-xl text-gray-300 mt-4">
+          Discover a selection of movies based on your preferences.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-6">
         {Array.isArray(movies) &&
           movies.map((movie) => <CardMovie key={movie.id} movie={movie} />)}
       </div>
-      <div className="pagination mt-4 flex items-center gap-4">
+
+      <div className="pagination mt-8 flex justify-center items-center gap-8">
         <button
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
           disabled={page === 1}
+          className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300 disabled:bg-gray-500"
         >
           Previous
         </button>
-        <span>
+        <span className="text-lg text-gray-100">
           Page {page} of {totalPages}
         </span>
         <button
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
           disabled={page === totalPages}
+          className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300 disabled:bg-gray-500"
         >
           Next
         </button>
