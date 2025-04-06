@@ -1,21 +1,12 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import App from "./App";
-import Home from "./pages/Home";
-import Movies from "./pages/Movies";
-import Games from "./pages/Games";
-import Recommendations from "./pages/Recommendations";
+import { BrowserRouter as Router } from "react-router-dom"; // Utilise Router ici pour englober App
+import App from "./App"; // App contient la logique des routes
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Router>
-    <App /> {/* Rendre App directement ici pour qu'il inclut Navbar */}
-    <Routes>
-      <Route path="/home" element={<Home />} />
-      <Route path="/movies" element={<Movies />} />
-      <Route path="/games" element={<Games />} />
-      <Route path="/recommendations" element={<Recommendations />} />
-    </Routes>
+    {" "}
+    {/* On englobe toute l'application avec Router */}
+    <App /> {/* App contient toutes les routes */}
   </Router>
 );
