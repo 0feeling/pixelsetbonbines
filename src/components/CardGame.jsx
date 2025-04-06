@@ -12,14 +12,14 @@ const CardGame = ({ game }) => {
   const releaseDate = game.first_release_date
     ? new Date(game.first_release_date * 1000).toLocaleDateString()
     : "N/A";
-
+  console.log(game);
   return (
     <div
       key={game.id}
       className="p-4 border rounded-md shadow-md hover:shadow-lg transition-shadow"
     >
       <img
-        src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover?.image_id}.jpg`}
+        src={game.background_image || "/placeholder-game.jpg"}
         alt={game.name}
         className="w-full h-auto rounded-md"
       />

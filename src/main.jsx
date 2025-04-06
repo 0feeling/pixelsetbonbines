@@ -7,6 +7,7 @@ import App from "./App";
 import Home from "./pages/Home";
 import Movies from "./pages/Movies";
 import Games from "./pages/Games";
+import Recommendations from "./pages/Recommendations";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Router>
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/home" element={<Home />} />
       <Route path="/movies" element={<Movies />} />
       <Route path="/games" element={<Games />} />
+      <Route path="/recommendations" element={<Recommendations />} />
     </Routes>
   </Router>
 );

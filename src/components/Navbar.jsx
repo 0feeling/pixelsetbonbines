@@ -21,6 +21,12 @@ const Navbar = () => {
             Games
           </Link>
         </li>
+
+        <li>
+          <Link to="/recommandations" className="text-white">
+            Recommandations
+          </Link>
+        </li>
       </ul>
     </nav>
   );
