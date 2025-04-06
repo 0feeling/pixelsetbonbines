@@ -24,13 +24,3 @@ export const fetchGames = async (page = 1, pageSize = 10) => {
     throw error; // Relance de l'erreur
   }
 };
-
-export const fetchMovies = async (page = 1) => {
-  const url = `https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=${page}`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error("Erreur lors de la récupération des films");
-  }
-  const data = await response.json();
-  return data;
-};

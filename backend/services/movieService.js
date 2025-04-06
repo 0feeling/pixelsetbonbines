@@ -1,15 +1,18 @@
 import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config();
 
-const fetchMovies = async () => {
-  try {
-    const response = await axios.get(
-      `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}`
-    );
-    return response.data.results;
-  } catch (error) {
-    console.error("Error fetching movies:", error);
-    return [];
-  }
+const TMDB_BASE_URL = "https://api.themoviedb.org/3";
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
+
+export const fetchMovies = async (page = 1) => {
+  const response = await axios.get(`${TMDB_BASE_URL}/movie/popular`, {
+    params: {
+      api_key: TMDB_API_KEY,
+      page
+    }
+  });
+
+  // ici, on retourne tout : { results, total_pages, total_results, ... }
+  return response.data;
 };
-
-export { fetchMovies };

@@ -1,14 +1,17 @@
 import { fetchMovies } from "../services/movieService.js";
 
-const getMovies = async (req, res) => {
-  const { page = 1, pageSize = 10 } = req.query; // Récupérer les paramètres de page et de pageSize
+export const getMovies = async (req, res) => {
+  const { page = 1 } = req.query;
+
   try {
-    const movies = await fetchMovies(page, pageSize);
-    res.json(movies);
+    const data = await fetchMovies(page);
+    console.log("Data sent to frontend:", {
+      resultsLength: data.results?.length,
+      totalPages: data.total_pages
+    });
+    res.json(data); // renvoie { results: [...], total_pages: ... }
   } catch (error) {
-    console.error("Error fetching movies:", error);
+    console.error("Controller error:", error.message);
     res.status(500).json({ message: "Unable to fetch movies" });
   }
 };
-
-export { getMovies };
