@@ -25,7 +25,8 @@ const Recommendations = () => {
       }
 
       const data = await response.json();
-      setRecommendations(data);
+      console.log("Réponse générée par :", data.source);
+      setRecommendations(data.data); // <- ici on prend le tableau réel
     } catch (error) {
       console.error("Error while fetching recommendations:", error);
       setError("There was an issue with the recommendation API.");
@@ -45,7 +46,7 @@ const Recommendations = () => {
         </p>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 mb-8">
+      <div className="max-w-2xl text-black mx-auto px-4 mb-8">
         {/* Game or movie selection */}
         <input
           type="text"
