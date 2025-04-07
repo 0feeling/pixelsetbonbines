@@ -75,9 +75,7 @@ const Recommendations = () => {
             <CardRecommendation key={index} item={item} />
           ))
         ) : (
-          <p className="text-center text-gray-100">
-            No recommendations available yet.
-          </p>
+          <p className="text-center text-gray-100"></p>
         )}
       </div>
     </div>

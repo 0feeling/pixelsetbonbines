@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
+import { WishlistContext } from "../contexts/WishlistContext"; // Importer le contexte Wishlist
 
 const CardGame = ({ game }) => {
+  const { addToWishlist } = useContext(WishlistContext); // Utiliser le hook pour ajouter à la wishlist
   // Extraction des informations supplémentaires du jeu
   const genres = game.genres
     ? game.genres.map((genre) => genre.name).join(", ")
@@ -12,6 +14,10 @@ const CardGame = ({ game }) => {
   const releaseDate = game.first_release_date
     ? new Date(game.first_release_date * 1000).toLocaleDateString()
     : "N/A";
+
+  const handleAddToWishlist = () => {
+    addToWishlist(game); // Ajouter le jeu à la wishlist
+  };
 
   return (
     <div
@@ -39,6 +45,14 @@ const CardGame = ({ game }) => {
           <strong>Release Date:</strong> {releaseDate}
         </p>
       </div>
+
+      {/* Ajouter le bouton "Add to Wishlist" */}
+      <button
+        onClick={handleAddToWishlist}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+      >
+        Add to Wishlist
+      </button>
     </div>
   );
 };

@@ -1,11 +1,17 @@
-import React from "react";
+import React, { useContext } from "react";
+import { WishlistContext } from "../contexts/WishlistContext"; // Importer le contexte Wishlist
 
 const CardMovie = ({ movie }) => {
+  const { addToWishlist } = useContext(WishlistContext); // Utiliser le hook pour ajouter à la wishlist
   const genres = movie.genres
     ? movie.genres.map((genre) => genre.name).join(", ")
     : "N/A";
   const runtime = movie.runtime ? `${movie.runtime} min` : "N/A";
   const rating = movie.vote_average ? movie.vote_average.toFixed(1) : "N/A";
+
+  const handleAddToWishlist = () => {
+    addToWishlist(movie); // Ajouter le film à la wishlist
+  };
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow">
@@ -29,6 +35,14 @@ const CardMovie = ({ movie }) => {
           <strong>Rating:</strong> {rating}
         </p>
       </div>
+
+      {/* Ajouter le bouton "Add to Wishlist" */}
+      <button
+        onClick={handleAddToWishlist}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+      >
+        Add to Wishlist
+      </button>
     </div>
   );
 };

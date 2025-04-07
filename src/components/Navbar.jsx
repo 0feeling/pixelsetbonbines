@@ -9,7 +9,7 @@ const Navbar = () => {
         <ul className="flex space-x-6">
           <li>
             <Link
-              to="/home"
+              to="/"
               className="text-white hover:text-teal-400 transition-colors duration-300"
             >
               Home
@@ -37,6 +37,23 @@ const Navbar = () => {
               className="text-white hover:text-teal-400 transition-colors duration-300"
             >
               Recommendations
+            </Link>
+          </li>
+          {/* Liens pour SignIn et SignUp */}
+          <li>
+            <Link
+              to="/signIn"
+              className="text-white hover:text-teal-400 transition-colors duration-300"
+            >
+              Sign In
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/signUp"
+              className="text-white hover:text-teal-400 transition-colors duration-300"
+            >
+              Sign Up
             </Link>
           </li>
         </ul>
