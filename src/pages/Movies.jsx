@@ -11,11 +11,19 @@ const Movies = () => {
   const searchQuery = searchParams.get("search")?.toLowerCase() || "";
   const selectedCategory = searchParams.get("category") || "";
   const selectedSort = searchParams.get("sort") || "popularity";
+  const page = searchParams.get("page") || 1; // Vous pouvez ajouter une pagination ici si nécessaire
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("/api/movies");
+        const res = await axios.get("/api/movies", {
+          params: {
+            page,
+            genres: selectedCategory,
+            search: searchQuery,
+            sort: selectedSort
+          }
+        });
         setMovies(res.data.results || []);
       } catch (err) {
         console.error("Failed to fetch movies:", err);
@@ -24,7 +32,7 @@ const Movies = () => {
 
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("/api/movies/genres");
+        const res = await axios.get("/api/genres");
         const genreNames = res.data.map((genre) => genre.name);
         setCategories(genreNames);
       } catch (err) {
@@ -34,7 +42,7 @@ const Movies = () => {
 
     fetchData();
     fetchCategories();
-  }, []);
+  }, [searchQuery, selectedCategory, selectedSort, page]); // Ajout des dépendances pour réagir aux changements
 
   // 🔍 Filtrage dynamique des films
   const filteredMovies = movies

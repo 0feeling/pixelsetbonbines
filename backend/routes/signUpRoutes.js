@@ -7,9 +7,11 @@ import jwt from "jsonwebtoken"; // Importation de jsonwebtoken
 
 const router = express.Router();
 
-// Route pour l'inscription d'un nouvel utilisateur
+// Route pour l'inscription d'un nouvel utilisateur - noter que nous utilisons la racine "/"
 router.post("/register", async (req, res) => {
   console.log("Received request for /api/auth/register");
+  console.log("Request body:", req.body); // Log pour déboguer
+
   const { username, email, password } = req.body;
 
   // Vérification des champs
@@ -39,6 +41,12 @@ router.post("/register", async (req, res) => {
     // Sauvegarde de l'utilisateur dans la base de données
     await newUser.save();
 
+    // Vérification de JWT_SECRET
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is not defined in environment variables!");
+      return res.status(500).json({ message: "Server configuration error." });
+    }
+
     // Création du token JWT
     const token = jwt.sign(
       { userId: newUser._id, username: newUser.username },
@@ -46,8 +54,17 @@ router.post("/register", async (req, res) => {
       { expiresIn: "1h" } // Expiration du token
     );
 
-    // Réponse après l'inscription réussie, incluant le token
-    res.status(201).json({ message: "User created successfully.", token });
+    console.log("Generated token:", token); // Log pour déboguer
+
+    // Réponse après l'inscription réussie, incluant le token ET les données utilisateur
+    res.status(201).json({
+      message: "User created successfully.",
+      token,
+      user: {
+        username: newUser.username,
+        email: newUser.email
+      }
+    });
   } catch (error) {
     console.error("Error during user creation: ", error);
     res

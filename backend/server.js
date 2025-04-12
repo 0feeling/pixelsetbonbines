@@ -11,6 +11,20 @@ import protectedRoutes from "./routes/protectedRoutes.js";
 
 dotenv.config();
 
+// Ajouter au début de server.js
+const requiredEnvs = [
+  "MONGO_URI",
+  "JWT_SECRET",
+  "TMDB_API_KEY",
+  "RAWG_API_KEY"
+];
+for (const env of requiredEnvs) {
+  if (!process.env[env]) {
+    console.error(`Error: Environment variable ${env} is missing`);
+    process.exit(1);
+  }
+}
+
 // Initialiser l'application Express
 const app = express();
 
@@ -38,8 +52,8 @@ mongoose
   .catch((error) => console.log("Error connecting to MongoDB:", error));
 
 // Utiliser les routes
-app.use("/api/auth/login", signInRoutes); // POST /api/auth/login
-app.use("/api/auth/register", signUpRoutes);
+app.use("/api/auth", signInRoutes);
+app.use("/api/auth", signUpRoutes);
 console.log("Register route initialized"); // POST /api/auth/register
 app.use("/api/games", gameRoutes);
 app.use("/api/movies", movieRoutes);
