@@ -1,40 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { fetchGames } from "../services/api";
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
 import CardGame from "../components/CardGame";
 
 const Games = () => {
   const [games, setGames] = useState([]);
-  const [page, setPage] = useState(1); // Page actuelle
-  const [totalPages, setTotalPages] = useState(1); // Nombre total de pages
-  const pageSize = 10; // Taille de la page
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 10;
+
+  const cacheRef = useRef({}); // Cache des pages déjà chargées
 
   useEffect(() => {
-    const getGames = async () => {
-      const gameData = await fetchGames(page);
-      console.log("Game data:", gameData);
+    const fetchGames = async () => {
+      // Si les jeux sont déjà en cache, les utiliser
+      if (cacheRef.current[page]) {
+        console.log("✅ Frontend: Données servies depuis le cache");
+        setGames(cacheRef.current[page].results);
+        setTotalPages(cacheRef.current[page].totalPages);
+        return;
+      }
 
-      // Mettre à jour les jeux et le nombre de pages
-      setGames(gameData.results);
+      try {
+        const res = await axios.get(
+          `/api/games?page=${page}&pageSize=${pageSize}`
+        );
+        const total = Math.ceil(res.data.count / pageSize);
 
-      // Calculer le nombre total de pages
-      const totalPages = Math.ceil(gameData.count / pageSize);
-      setTotalPages(totalPages);
+        // Mise en cache
+        cacheRef.current[page] = {
+          results: res.data.results,
+          totalPages: total
+        };
+
+        setGames(res.data.results);
+        setTotalPages(total);
+        console.log("🔄 Frontend: Données récupérées depuis l'API");
+      } catch (error) {
+        console.error("❌ Erreur lors du chargement des jeux :", error.message);
+      }
     };
 
-    getGames();
-  }, [page]); // Recharger les jeux lorsque la page change
-
-  const handleNextPage = () => {
-    if (page < totalPages) {
-      setPage(page + 1); // Passer à la page suivante
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (page > 1) {
-      setPage(page - 1); // Passer à la page précédente
-    }
-  };
+    fetchGames();
+  }, [page]);
 
   return (
     <div className="bg-gradient-to-r from-blue-700 to-indigo-800 min-h-screen text-white py-12">

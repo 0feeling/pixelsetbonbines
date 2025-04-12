@@ -1,34 +1,24 @@
 // src/components/Filters.jsx
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useSearchParams } from "react-router-dom";
 
-const Filters = ({
-  categories,
-  selectedCategory,
-  selectedSort,
-  onCategoryChange,
-  onSortChange,
-  onSearchChange,
-  searchQuery
-}) => {
-  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
+const Filters = ({ categories, contentType = "movies" }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Fonction pour gérer le changement de recherche
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setLocalSearchQuery(value);
-    onSearchChange(value); // Met à jour le searchQuery dans le parent
-  };
+  // Récupération des paramètres actuels
+  const searchQuery = searchParams.get("search") || "";
+  const selectedCategory = searchParams.get("category") || "";
+  const selectedSort = searchParams.get("sort") || "popularity";
 
-  // Fonction pour gérer le changement de catégorie
-  const handleCategoryChange = (e) => {
-    const category = e.target.value;
-    onCategoryChange(category); // Met à jour la catégorie dans le parent
-  };
-
-  // Fonction pour gérer le changement de tri
-  const handleSortChange = (e) => {
-    const sortBy = e.target.value;
-    onSortChange(sortBy); // Met à jour l'ordre de tri dans le parent
+  // Met à jour un paramètre donné dans l'URL
+  const handleParamChange = (key, value) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (value) {
+      newParams.set(key, value);
+    } else {
+      newParams.delete(key);
+    }
+    setSearchParams(newParams);
   };
 
   return (
@@ -36,24 +26,24 @@ const Filters = ({
       <h3>Filter Options</h3>
 
       {/* Moteur de recherche */}
-      <div>
+      <div className="filter-group">
         <label htmlFor="search">Search:</label>
         <input
           type="text"
           id="search"
-          value={localSearchQuery}
-          onChange={handleSearchChange}
-          placeholder="Search by title..."
+          value={searchQuery}
+          onChange={(e) => handleParamChange("search", e.target.value)}
+          placeholder={`Search ${contentType} by title...`}
         />
       </div>
 
       {/* Filtre par catégorie */}
-      <div>
+      <div className="filter-group">
         <label htmlFor="category">Category:</label>
         <select
           id="category"
           value={selectedCategory}
-          onChange={handleCategoryChange}
+          onChange={(e) => handleParamChange("category", e.target.value)}
         >
           <option value="">All Categories</option>
           {categories.map((category, index) => (
@@ -65,9 +55,13 @@ const Filters = ({
       </div>
 
       {/* Tri des résultats */}
-      <div>
+      <div className="filter-group">
         <label htmlFor="sort">Sort by:</label>
-        <select id="sort" value={selectedSort} onChange={handleSortChange}>
+        <select
+          id="sort"
+          value={selectedSort}
+          onChange={(e) => handleParamChange("sort", e.target.value)}
+        >
           <option value="popularity">Popularity</option>
           <option value="release_date">Release Date</option>
           <option value="rating">Rating</option>

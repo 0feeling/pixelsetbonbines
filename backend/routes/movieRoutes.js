@@ -1,9 +1,9 @@
-import express from "express"; // Importation avec ES6 import
-import { getMovies } from "../controllers/movieController.js"; // Importation de la fonction getMovies
+import express from "express";
+import { getMovies, getGenres } from "../controllers/movieController.js";
 
 const router = express.Router();
 
-// Route pour récupérer les films
-router.get("/", getMovies);
+router.get("/movies", getMovies);
+router.get("/genres", getGenres);
 
-export default router; // Exportation avec ES6 export
+export default router;

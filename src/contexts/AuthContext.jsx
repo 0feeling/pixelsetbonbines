@@ -1,27 +1,51 @@
-// src/contexts/AuthContext.js
-import React, { createContext, useContext, useState } from "react";
+// contexts/AuthContext.js
+import { createContext, useContext, useState, useEffect } from "react";
 
-// Crée un contexte d'authentification
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
-// Le fournisseur du contexte
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // L'état de l'utilisateur (null si non connecté)
+  const [currentUser, setCurrentUser] = useState(null);
 
   const login = (userData) => {
-    setUser(userData); // Connecter l'utilisateur
+    setCurrentUser(userData);
+    localStorage.setItem("authToken", userData.token); // facultatif selon ta logique
   };
 
   const logout = () => {
-    setUser(null); // Déconnecter l'utilisateur
+    setCurrentUser(null);
+    localStorage.removeItem("authToken");
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+
+    if (token) {
+      fetch("http://localhost:5000/api/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Invalid token");
+          return res.json();
+        })
+        .then((data) => {
+          setCurrentUser(data); // data = { email, username }
+        })
+        .catch((err) => {
+          console.error("Token validation failed:", err);
+          logout(); // nettoyer si le token est invalide
+        });
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ currentUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Un hook pour accéder au contexte dans les composants
 export const useAuth = () => useContext(AuthContext);

@@ -28,6 +28,7 @@ const CardMovie = ({ movie }) => {
         <p>
           <strong>Genres:</strong> {genres}
         </p>
+
         <p>
           <strong>Runtime:</strong> {runtime}
         </p>

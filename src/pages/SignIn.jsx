@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import { useAuth } from "../contexts/AuthContext"; // ← importe ton contexte
+import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth(); // ← récupère la fonction login du contexte
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -29,7 +33,15 @@ const SignIn = () => {
         throw new Error(data.message || "Login failed");
       }
 
-      setMessage(data.message);
+      // Le serveur renvoie ici le token JWT
+      const token = data.token;
+      // Stocke le token dans le localStorage ou un contexte global pour l'utiliser plus tard
+      localStorage.setItem("authToken", token);
+
+      // Si nécessaire, tu peux également récupérer les données de l'utilisateur
+      login(data.user); // ← stocke l'utilisateur dans le contexte
+
+      navigate("/dashboard"); // ← redirige où tu veux une fois connecté
     } catch (err) {
       setError(err.message);
     } finally {

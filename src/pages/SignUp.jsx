@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const SignUp = () => {
   const [username, setUsername] = useState("");
@@ -8,6 +9,7 @@ const SignUp = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -17,11 +19,9 @@ const SignUp = () => {
     setError(null);
 
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password })
       });
 
@@ -31,8 +31,15 @@ const SignUp = () => {
         throw new Error(data.message || "Sign up failed");
       }
 
-      setMessage(data.message);
-      navigate("/signIn"); // Rediriger vers la page de connexion après inscription
+      // Le serveur renvoie ici le token JWT
+      const token = data.token;
+      // Stocke le token dans le localStorage ou un contexte global pour l'utiliser plus tard
+      localStorage.setItem("authToken", token);
+
+      // Connexion automatique après l'inscription
+      login(data.user); // ← stocke l'utilisateur dans le contexte
+
+      navigate("/dashboard"); // ← redirige où tu veux une fois inscrit
     } catch (err) {
       setError(err.message);
     } finally {

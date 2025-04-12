@@ -7,16 +7,17 @@ import movieRoutes from "./routes/movieRoutes.js";
 import recommendRoutes from "./routes/recommendRoutes.js";
 import signUpRoutes from "./routes/signUpRoutes.js";
 import signInRoutes from "./routes/signInRoutes.js";
+import protectedRoutes from "./routes/protectedRoutes.js";
 
 dotenv.config();
 
+// Initialiser l'application Express
 const app = express();
 
-// Activer CORS avec des options spécifiques pour l'origine
 const corsOptions = {
-  origin: "http://localhost:5173", // Remplace par l'URL de ton frontend
-  methods: "GET,POST,PUT,DELETE", // Les méthodes autorisées
-  allowedHeaders: "Content-Type,Authorization" // Les en-têtes autorisés
+  origin: "*", // Autorise toutes les origines pour tester (même si ce n'est pas sécurisé en production)
+  methods: "GET,POST,PUT,DELETE", // Toutes les méthodes autorisées
+  allowedHeaders: "Content-Type,Authorization" // Autorise les en-têtes nécessaires
 };
 
 app.use(cors(corsOptions));
@@ -43,6 +44,7 @@ console.log("Register route initialized"); // POST /api/auth/register
 app.use("/api/games", gameRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/recommendations", recommendRoutes);
+app.use("/api", protectedRoutes); // Déplacer cette ligne après l'initialisation de l'app
 
 // Route par défaut pour gérer les requêtes vers la racine
 app.get("/", (req, res) => {

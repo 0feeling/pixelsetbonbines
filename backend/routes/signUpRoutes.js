@@ -3,6 +3,7 @@
 import express from "express";
 import bcrypt from "bcrypt"; // Utilisation de bcrypt pour le hachage des mots de passe
 import User from "../models/User.js"; // Importer le modèle User
+import jwt from "jsonwebtoken"; // Importation de jsonwebtoken
 
 const router = express.Router();
 
@@ -38,8 +39,15 @@ router.post("/register", async (req, res) => {
     // Sauvegarde de l'utilisateur dans la base de données
     await newUser.save();
 
-    // Réponse après l'inscription réussie
-    res.status(201).json({ message: "User created successfully." });
+    // Création du token JWT
+    const token = jwt.sign(
+      { userId: newUser._id, username: newUser.username },
+      process.env.JWT_SECRET, // Clé secrète pour signer le token
+      { expiresIn: "1h" } // Expiration du token
+    );
+
+    // Réponse après l'inscription réussie, incluant le token
+    res.status(201).json({ message: "User created successfully.", token });
   } catch (error) {
     console.error("Error during user creation: ", error);
     res
