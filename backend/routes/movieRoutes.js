@@ -4,7 +4,7 @@ import { fetchMovies, fetchGenres } from "../services/movieService.js";
 const router = express.Router();
 
 // Route pour récupérer les films
-router.get("/movies", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const { page, genres, search, sort } = req.query;
     const movies = await fetchMovies(page, genres, search, sort);

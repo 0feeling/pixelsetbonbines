@@ -1,21 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import CardMovie from "../components/CardMovie";
 import Filters from "../components/Filters";
 import axios from "axios";
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const [searchParams] = useSearchParams();
-  const searchQuery = searchParams.get("search")?.toLowerCase() || "";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
   const selectedCategory = searchParams.get("category") || "";
-  const selectedSort = searchParams.get("sort") || "popularity";
-  const page = searchParams.get("page") || 1; // Vous pouvez ajouter une pagination ici si nécessaire
+  const selectedSort = searchParams.get("sort") || "popularity.desc"; // Changed to match backend
+  const page = parseInt(searchParams.get("page") || "1", 10);
+
+  // Function to handle page changes
+  const handlePageChange = (newPage) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("page", newPage);
+    setSearchParams(newParams);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMoviesData = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
+        console.log("Fetching movies with params:", {
+          page,
+          genres: selectedCategory,
+          search: searchQuery,
+          sort: selectedSort
+        });
+
+        // Use the correct endpoint based on your routes
         const res = await axios.get("/api/movies", {
           params: {
             page,
@@ -24,59 +46,97 @@ const Movies = () => {
             sort: selectedSort
           }
         });
-        setMovies(res.data.results || []);
+
+        console.log("Movies API response:", res.data);
+
+        if (res.data && res.data.results) {
+          setMovies(res.data.results);
+          setTotalPages(res.data.total_pages || 1);
+        } else {
+          setMovies([]);
+          setError("No movies data found");
+        }
       } catch (err) {
         console.error("Failed to fetch movies:", err);
+        setError("Failed to load movies. Please try again later.");
+        setMovies([]);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const fetchCategories = async () => {
+    const fetchGenres = async () => {
       try {
-        const res = await axios.get("/api/genres");
-        const genreNames = res.data.map((genre) => genre.name);
-        setCategories(genreNames);
+        // Use the correct endpoint based on your routes
+        const res = await axios.get("/api/movies/genres");
+        console.log("Genres API response:", res.data);
+
+        if (res.data && Array.isArray(res.data)) {
+          setGenres(res.data);
+        }
       } catch (err) {
-        console.error("Failed to fetch categories:", err);
+        console.error("Failed to fetch genres:", err);
       }
     };
 
-    fetchData();
-    fetchCategories();
-  }, [searchQuery, selectedCategory, selectedSort, page]); // Ajout des dépendances pour réagir aux changements
+    fetchMoviesData();
+    fetchGenres();
+  }, [searchQuery, selectedCategory, selectedSort, page]);
 
-  // 🔍 Filtrage dynamique des films
-  const filteredMovies = movies
-    .filter((movie) => movie.title.toLowerCase().includes(searchQuery))
-    .filter((movie) =>
-      selectedCategory ? movie.genres.includes(selectedCategory) : true
-    )
-    .sort((a, b) => {
-      if (selectedSort === "release_date") {
-        return new Date(b.release_date) - new Date(a.release_date);
-      }
-      if (selectedSort === "rating") {
-        return b.vote_average - a.vote_average;
-      }
-      // Default: popularity
-      return b.popularity - a.popularity;
-    });
+  // Extract genre names for the filters component
+  const genreNames = genres.map((genre) => genre.name);
 
   return (
-    <div className="movies-page">
-      <h2 className="text-2xl font-bold mb-4">Movies</h2>
+    <div className="movies-page bg-gray-900 min-h-screen p-6">
+      <div className="container mx-auto">
+        <h2 className="text-4xl font-bold mb-8 text-white text-center">
+          Movies
+        </h2>
 
-      <Filters categories={categories} contentType="movies" />
+        <Filters categories={genreNames} contentType="movies" />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-        {filteredMovies.map((movie) => (
-          <div key={movie.id} className="bg-gray-800 text-white p-4 rounded-xl">
-            <h3 className="text-lg font-semibold">{movie.title}</h3>
-            <p className="text-sm">{movie.release_date}</p>
-            <p className="text-xs text-gray-400 mt-1">
-              {movie.genres.join(", ")}
-            </p>
+        {error && (
+          <div className="bg-red-500 text-white p-3 rounded my-4">{error}</div>
+        )}
+
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-xl text-white">Loading movies...</div>
           </div>
-        ))}
+        ) : movies.length === 0 ? (
+          <div className="text-white text-center py-10">
+            No movies found matching your criteria.
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+              {movies.map((movie) => (
+                <CardMovie key={movie.id} movie={movie} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="pagination mt-8 flex justify-center items-center gap-8">
+              <button
+                onClick={() => handlePageChange(Math.max(page - 1, 1))}
+                disabled={page === 1}
+                className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300 disabled:bg-gray-500"
+              >
+                Previous
+              </button>
+              <span className="text-lg text-gray-100">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                onClick={() => handlePageChange(Math.min(page + 1, totalPages))}
+                disabled={page === totalPages}
+                className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300 disabled:bg-gray-500"
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
